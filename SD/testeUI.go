@@ -14,6 +14,12 @@ package main
 
 import (
 	"fmt"
+	"bufio"
+	"os"
+	"strings"
+    "io"
+	"io/ioutil"
+    "log"
 
 	term "github.com/nsf/termbox-go"
 )
@@ -36,8 +42,8 @@ type Player struct {
 func printState(g GameState) {
 	reset()
 	//fmt.Println(g)
-	for i := 0; i < g.xSize; i++ {
-		for j := 0; j < g.ySize; j++ {
+	for i := 0; i < g.ySize; i++ {
+		for j := 0; j < g.xSize; j++ {
 			fmt.Print(string(g.mesa[i][j]))
 		}
 		fmt.Println("")
@@ -45,6 +51,7 @@ func printState(g GameState) {
 }
 
 func main() {
+
 	err := term.Init()
 	if err != nil {
 		panic(err)
@@ -54,29 +61,29 @@ func main() {
 
 	fmt.Println("Enter any key to see their ASCII code or press ESC button to quit")
 
-	const Xs = 25
-	const Ys = 50
+	const Xs = 28
+	const Ys = 30
 
-	mesa1 := make([][]rune, Xs)
-	for i := 0; i < Xs; i++ {
-		mesa1[i] = make([]rune, Ys)
+	mesa1 := make([][]rune, Ys)
+	for i := 0; i < Ys; i++ {
+		mesa1[i] = make([]rune, Xs)
 	}
-	// for i := 0; i < Xs; i++ {
-	// 	for j := 0; j < Ys; j++ {
-	// 		mesa1[i][j] = '.'
-	// 	}
-	// }
-	filename := "test.txt"
+
+	filename := "map.txt"
 
 	filebuffer, err := ioutil.ReadFile(filename)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+
 	inputdata := string(filebuffer)
 
 	r := bufio.NewReader(strings.NewReader(inputdata))
 	
+	i := 0
+	j := 0
+
     for {
         if c, sz, err := r.ReadRune(); err != nil {
             if err == io.EOF {
@@ -85,11 +92,20 @@ func main() {
                 log.Fatal(err)
             }
         } else {
-            fmt.Printf("%q [%d]\n", string(c), sz)
+			if c == '\n' {
+					j = 0
+					i++
+					fmt.Println(i)
+				} else {
+					mesa1[i][j] = c
+					j++
+				}
+            fmt.Printf("%q [%d] - i: %d, j: %d\n", string(c), sz, i, j)
         }
     }
 
 	g := GameState{xSize: Xs, ySize: Ys, mesa: mesa1}
+		printState(g)
 	p := Player{x: 0, y: 0, ch: 'k'}
 	pOld := Player{x: -1, y: -1, ch: ' '}
 
