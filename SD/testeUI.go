@@ -114,7 +114,7 @@ func main() {
 keyPressListenerLoop:
 	for {
 		if !(p == pOld) {
-			g.mesa[p.x][p.y] = p.ch
+			g.mesa[p.y][p.x] = p.ch
 			printState(g)
 			pOld = p
 		}
@@ -195,25 +195,36 @@ keyPressListenerLoop:
 			case term.KeyEsc:
 				break keyPressListenerLoop
 			case term.KeyArrowUp:
-				// reset()
-				fmt.Println("Arrow Up pressed")
-				mesa1[p.x][p.y] = '.'
-				p.x = (p.x + Xs - 1) % Xs
+				reset()
+				// fmt.Println("Arrow Up pressed")
+				mesa1[p.y][p.x] = '.'
+				result := (p.y + Ys - 1) % Ys
+				if mesa1[result][p.x] != '#' {
+					p.y = result;
+				}
 			case term.KeyArrowDown:
 				// reset()
 				fmt.Println("Arrow Down pressed")
-				mesa1[p.x][p.y] = '.'
-				p.x = (p.x + 1) % Xs
+				mesa1[p.y][p.x] = '.'
+				p.y = (p.y + 1) % Ys
+				// mesa1[p.y][p.x] = '.'
+				// result := (p.y + 1) % Ys
+				// if mesa1[result][p.x] != '#' {
+				// 	p.y = result
+				// }
 			case term.KeyArrowLeft:
 				// reset()
 				fmt.Println("Arrow Left pressed")
-				mesa1[p.x][p.y] = '.'
-				p.y = (p.y + Ys - 1) % Ys
+				mesa1[p.y][p.x] = '.'
+				result := (p.x + Xs - 1) % Xs
+				if mesa1[p.y][result] == '#' {
+					p.x = result
+				}
 			case term.KeyArrowRight:
 				// reset()
 				fmt.Println("Arrow Right pressed")
-				mesa1[p.x][p.y] = '.'
-				p.y = (p.y + 1) % Ys
+				mesa1[p.y][p.x] = '.'
+				p.x = (p.x + 1) % Xs
 			default:
 				// we only want to read a single character or one key pressed event
 				// reset()
