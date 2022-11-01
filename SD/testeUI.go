@@ -61,13 +61,36 @@ func main() {
 	for i := 0; i < Xs; i++ {
 		mesa1[i] = make([]rune, Ys)
 	}
-	for i := 0; i < Xs; i++ {
-		for j := 0; j < Ys; j++ {
-			mesa1[i][j] = '.'
-		}
+	// for i := 0; i < Xs; i++ {
+	// 	for j := 0; j < Ys; j++ {
+	// 		mesa1[i][j] = '.'
+	// 	}
+	// }
+	filename := "test.txt"
+
+	filebuffer, err := ioutil.ReadFile(filename)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
+	inputdata := string(filebuffer)
+
+	r := bufio.NewReader(strings.NewReader(inputdata))
+	
+    for {
+        if c, sz, err := r.ReadRune(); err != nil {
+            if err == io.EOF {
+                break
+            } else {
+                log.Fatal(err)
+            }
+        } else {
+            fmt.Printf("%q [%d]\n", string(c), sz)
+        }
+    }
+
 	g := GameState{xSize: Xs, ySize: Ys, mesa: mesa1}
-	p := Player{x: 0, y: 0, ch: ' '}
+	p := Player{x: 0, y: 0, ch: 'k'}
 	pOld := Player{x: -1, y: -1, ch: ' '}
 
 	printState(g)
@@ -158,18 +181,22 @@ keyPressListenerLoop:
 			case term.KeyArrowUp:
 				// reset()
 				fmt.Println("Arrow Up pressed")
+				mesa1[p.x][p.y] = '.'
 				p.x = (p.x + Xs - 1) % Xs
 			case term.KeyArrowDown:
 				// reset()
 				fmt.Println("Arrow Down pressed")
+				mesa1[p.x][p.y] = '.'
 				p.x = (p.x + 1) % Xs
 			case term.KeyArrowLeft:
 				// reset()
 				fmt.Println("Arrow Left pressed")
+				mesa1[p.x][p.y] = '.'
 				p.y = (p.y + Ys - 1) % Ys
 			case term.KeyArrowRight:
 				// reset()
 				fmt.Println("Arrow Right pressed")
+				mesa1[p.x][p.y] = '.'
 				p.y = (p.y + 1) % Ys
 			default:
 				// we only want to read a single character or one key pressed event
