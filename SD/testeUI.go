@@ -140,14 +140,14 @@ keyPressListenerLoop:
 				// reset()
 				g.mesa[p.y][p.x] = '.'
 				result := (p.x + Xs - 1) % Xs
-				if g.mesa[result][p.x] != '#' {
+				if g.mesa[p.y][result] != '#' {
 					p.x = result
 				}
 			case term.KeyArrowRight:
 				// reset()
 				g.mesa[p.y][p.x] = '.'
-				result := (p.x + 1) % Xs
-				if g.mesa[result][result] != '#' {
+				result := (p.x + 1)
+				if g.mesa[p.y][result] != '#' {
 					p.x = result
 				}
 			}
