@@ -13,13 +13,13 @@
 package main
 
 import (
-	"fmt"
 	"bufio"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"log"
 	"os"
 	"strings"
-    "io"
-	"io/ioutil"
-    "log"
 
 	term "github.com/nsf/termbox-go"
 )
@@ -41,7 +41,7 @@ type Player struct {
 
 func printState(g GameState) {
 	reset()
-	//fmt.Println(g)
+	fmt.Println(g)
 	for i := 0; i < g.ySize; i++ {
 		for j := 0; j < g.xSize; j++ {
 			fmt.Print(string(g.mesa[i][j]))
@@ -80,33 +80,32 @@ func main() {
 	inputdata := string(filebuffer)
 
 	r := bufio.NewReader(strings.NewReader(inputdata))
-	
+
 	i := 0
 	j := 0
 
-    for {
-        if c, sz, err := r.ReadRune(); err != nil {
-            if err == io.EOF {
-                break
-            } else {
-                log.Fatal(err)
-            }
-        } else {
+	for {
+		if c, sz, err := r.ReadRune(); err != nil {
+			if err == io.EOF {
+				break
+			} else {
+				log.Fatal(err)
+			}
+		} else {
 			if c == '\n' {
-					j = 0
-					i++
-					fmt.Println(i)
-				} else {
-					mesa1[i][j] = c
-					j++
-				}
-            fmt.Printf("%q [%d] - i: %d, j: %d\n", string(c), sz, i, j)
-        }
-    }
+				j = 0
+				i++
+				fmt.Println(i)
+			} else {
+				mesa1[i][j] = c
+				j++
+			}
+			fmt.Printf("%q [%d] - i: %d, j: %d\n", string(c), sz, i, j)
+		}
+	}
 
 	g := GameState{xSize: Xs, ySize: Ys, mesa: mesa1}
-		printState(g)
-	p := Player{x: 0, y: 0, ch: 'k'}
+	p := Player{x: 1, y: 1, ch: 'k'}
 	pOld := Player{x: -1, y: -1, ch: ' '}
 
 	printState(g)
@@ -121,119 +120,37 @@ keyPressListenerLoop:
 		switch ev := term.PollEvent(); ev.Type {
 		case term.EventKey:
 			switch ev.Key {
-
-			// -CASOS NAO USADOS AQUI ----------------------------------------------
-			case term.KeyF1:
-				reset()
-				fmt.Println("F1 pressed")
-			case term.KeyF2:
-				reset()
-				fmt.Println("F2 pressed")
-			case term.KeyF3:
-				reset()
-				fmt.Println("F3 pressed")
-			case term.KeyF4:
-				reset()
-				fmt.Println("F4 pressed")
-			case term.KeyF5:
-				reset()
-				fmt.Println("F5 pressed")
-			case term.KeyF6:
-				reset()
-				fmt.Println("F6 pressed")
-			case term.KeyF7:
-				reset()
-				fmt.Println("F7 pressed")
-			case term.KeyF8:
-				reset()
-				fmt.Println("F8 pressed")
-			case term.KeyF9:
-				reset()
-				fmt.Println("F9 pressed")
-			case term.KeyF10:
-				reset()
-				fmt.Println("F10 pressed")
-			case term.KeyF11:
-				reset()
-				fmt.Println("F11 pressed")
-			case term.KeyF12:
-				reset()
-				fmt.Println("F12 pressed")
-			case term.KeyInsert:
-				reset()
-				fmt.Println("Insert pressed")
-			case term.KeyDelete:
-				reset()
-				fmt.Println("Delete pressed")
-			case term.KeyHome:
-				reset()
-				fmt.Println("Home pressed")
-			case term.KeyEnd:
-				reset()
-				fmt.Println("End pressed")
-			case term.KeyPgup:
-				reset()
-				fmt.Println("Page Up pressed")
-			case term.KeyPgdn:
-				reset()
-				fmt.Println("Page Down pressed")
-			case term.KeySpace:
-				reset()
-				fmt.Println("Space pressed")
-			case term.KeyBackspace:
-				reset()
-				fmt.Println("Backspace pressed")
-			case term.KeyEnter:
-				reset()
-				fmt.Println("Enter pressed")
-			case term.KeyTab:
-				reset()
-				fmt.Println("Tab pressed")
-				// -ATE AQUI NAO USA AINDA ----------------------------------------------
-
-				// -USAMOS DAQUI PARA BAIXO----------------------------------------------
 			case term.KeyEsc:
 				break keyPressListenerLoop
 			case term.KeyArrowUp:
-				reset()
-				// fmt.Println("Arrow Up pressed")
-				mesa1[p.y][p.x] = '.'
+				// reset()
+				g.mesa[p.y][p.x] = '.'
 				result := (p.y + Ys - 1) % Ys
-				if mesa1[result][p.x] != '#' {
-					p.y = result;
+				if g.mesa[result][p.x] != '#' {
+					p.y = result
 				}
 			case term.KeyArrowDown:
 				// reset()
-				fmt.Println("Arrow Down pressed")
-				mesa1[p.y][p.x] = '.'
-				p.y = (p.y + 1) % Ys
-				// mesa1[p.y][p.x] = '.'
-				// result := (p.y + 1) % Ys
-				// if mesa1[result][p.x] != '#' {
-				// 	p.y = result
-				// }
+				g.mesa[p.y][p.x] = '.'
+				result := (p.y + 1) % Ys
+				if g.mesa[result][p.x] != '#' {
+					p.y = result
+				}
 			case term.KeyArrowLeft:
 				// reset()
-				fmt.Println("Arrow Left pressed")
-				mesa1[p.y][p.x] = '.'
+				g.mesa[p.y][p.x] = '.'
 				result := (p.x + Xs - 1) % Xs
-				if mesa1[p.y][result] == '#' {
+				if g.mesa[result][p.x] != '#' {
 					p.x = result
 				}
 			case term.KeyArrowRight:
 				// reset()
-				fmt.Println("Arrow Right pressed")
-				mesa1[p.y][p.x] = '.'
-				p.x = (p.x + 1) % Xs
-			default:
-				// we only want to read a single character or one key pressed event
-				// reset()
-				p.ch = ev.Ch
-				fmt.Println("ASCII : ", ev.Ch)
-				// --------------------------------------------------------------------
-
+				g.mesa[p.y][p.x] = '.'
+				result := (p.x + 1) % Xs
+				if g.mesa[result][result] != '#' {
+					p.x = result
+				}
 			}
-
 		case term.EventError:
 			panic(ev.Err)
 		}
