@@ -40,7 +40,7 @@ type Player struct {
 }
 
 func printState(g GameState) {
-	reset()
+	//reset()
 	fmt.Println(g)
 	for i := 0; i < g.ySize; i++ {
 		for j := 0; j < g.xSize; j++ {
