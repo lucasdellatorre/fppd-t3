@@ -21,6 +21,7 @@ import (
 	"os"
 	"strings"
 	"math/rand"
+	"time"
 
 	term "github.com/nsf/termbox-go"
 )
@@ -63,7 +64,7 @@ func heroWon(g GameState) bool {
 }
 
 func main() {
-
+	rand.Seed(time.Now().UnixNano())
 	err := term.Init()
 	if err != nil {
 		panic(err)
