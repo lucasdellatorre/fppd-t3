@@ -20,6 +20,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"math/rand"
 
 	term "github.com/nsf/termbox-go"
 )
@@ -48,6 +49,17 @@ func printState(g GameState) {
 		}
 		fmt.Println("")
 	}
+}
+
+func heroWon(g GameState) bool {
+	for i := 0; i < g.ySize; i++ {
+		for j := 0; j < g.xSize; j++ {
+			if g.mesa[i][j] == '✪' {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 func main() {
@@ -97,15 +109,21 @@ func main() {
 				i++
 				fmt.Println(i)
 			} else {
-				mesa1[i][j] = c
-				j++
+				random := rand.Intn(10 - 1) + 1
+				if random == 1 && c!='#' {
+					mesa1[i][j] = '✪'
+					j++
+				} else {
+					mesa1[i][j] = c
+					j++
+				}
 			}
 			fmt.Printf("%q [%d] - i: %d, j: %d\n", string(c), sz, i, j)
 		}
 	}
 
 	g := GameState{xSize: Xs, ySize: Ys, mesa: mesa1}
-	p := Player{x: 1, y: 1, ch: 'k'}
+	p := Player{x: 1, y: 1, ch: 'A'}
 	pOld := Player{x: -1, y: -1, ch: ' '}
 
 	printState(g)
@@ -124,31 +142,47 @@ keyPressListenerLoop:
 				break keyPressListenerLoop
 			case term.KeyArrowUp:
 				// reset()
-				g.mesa[p.y][p.x] = '.'
+				g.mesa[p.y][p.x] = ' '
 				result := (p.y + Ys - 1) % Ys
 				if g.mesa[result][p.x] != '#' {
 					p.y = result
 				}
+				if heroWon(g) {
+					fmt.Println("Hero won!")
+					break keyPressListenerLoop
+				}
 			case term.KeyArrowDown:
 				// reset()
-				g.mesa[p.y][p.x] = '.'
+				g.mesa[p.y][p.x] = ' '
 				result := (p.y + 1) % Ys
 				if g.mesa[result][p.x] != '#' {
 					p.y = result
 				}
+				if heroWon(g) {
+					fmt.Println("Hero won!")
+					break keyPressListenerLoop
+				}
 			case term.KeyArrowLeft:
 				// reset()
-				g.mesa[p.y][p.x] = '.'
+				g.mesa[p.y][p.x] = ' '
 				result := (p.x + Xs - 1) % Xs
 				if g.mesa[p.y][result] != '#' {
 					p.x = result
 				}
+				if heroWon(g) {
+					fmt.Println("Hero won!")
+					break keyPressListenerLoop
+				}
 			case term.KeyArrowRight:
 				// reset()
-				g.mesa[p.y][p.x] = '.'
+				g.mesa[p.y][p.x] = ' '
 				result := (p.x + 1) % Xs
 				if g.mesa[p.y][result] != '#' {
 					p.x = result
+				}
+				if heroWon(g) {
+					fmt.Println("Hero won!")
+					break keyPressListenerLoop
 				}
 			}
 		case term.EventError:
