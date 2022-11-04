@@ -41,7 +41,7 @@ type Player struct {
 	ch rune
 }
 
-func printState(g GameState) {
+func printState(g GameState, villain Player, hero Player){
 	//reset()
 	fmt.Println(g)
 	for i := 0; i < g.ySize; i++ {
@@ -49,6 +49,16 @@ func printState(g GameState) {
 			fmt.Print(string(g.mesa[i][j]))
 		}
 		fmt.Println("")
+	}
+	if heroWon(g) {
+		for i := 0; i < 1000; i++ {
+			fmt.Println("Hero won!")
+		}
+	}
+	if villainWon(hero, villain) {
+		for i := 0; i < 1000; i++ {
+			fmt.Println("Villain won!")
+		}	
 	}
 }
 
@@ -63,7 +73,14 @@ func heroWon(g GameState) bool {
 	return true
 }
 
-func main() {
+func villainWon(hero Player, v Player) bool {
+	if v.x == hero.x && v.y == hero.y {
+		return true
+	}
+	return false
+}
+
+func main(){
 	rand.Seed(time.Now().UnixNano())
 	err := term.Init()
 	if err != nil {
@@ -110,7 +127,7 @@ func main() {
 				i++
 				fmt.Println(i)
 			} else {
-				random := rand.Intn(10 - 1) + 1
+				random := rand.Intn(50 - 1) + 1
 				if random == 1 && c!='#' {
 					mesa1[i][j] = '✪'
 					j++
@@ -124,16 +141,17 @@ func main() {
 	}
 
 	g := GameState{xSize: Xs, ySize: Ys, mesa: mesa1}
-	p := Player{x: 1, y: 1, ch: 'A'}
+	p := Player{x: 1, y: 1, ch: 'H'}
+	v := Player{x: 28, y: 27, ch: 'V'}
 	pOld := Player{x: -1, y: -1, ch: ' '}
 
-	printState(g)
+	printState(g, p, v)
 
 keyPressListenerLoop:
 	for {
 		if !(p == pOld) {
 			g.mesa[p.y][p.x] = p.ch
-			printState(g)
+			printState(g, p, v)
 			pOld = p
 		}
 		switch ev := term.PollEvent(); ev.Type {
@@ -148,10 +166,6 @@ keyPressListenerLoop:
 				if g.mesa[result][p.x] != '#' {
 					p.y = result
 				}
-				if heroWon(g) {
-					fmt.Println("Hero won!")
-					break keyPressListenerLoop
-				}
 			case term.KeyArrowDown:
 				// reset()
 				g.mesa[p.y][p.x] = ' '
@@ -159,10 +173,7 @@ keyPressListenerLoop:
 				if g.mesa[result][p.x] != '#' {
 					p.y = result
 				}
-				if heroWon(g) {
-					fmt.Println("Hero won!")
-					break keyPressListenerLoop
-				}
+
 			case term.KeyArrowLeft:
 				// reset()
 				g.mesa[p.y][p.x] = ' '
@@ -170,20 +181,13 @@ keyPressListenerLoop:
 				if g.mesa[p.y][result] != '#' {
 					p.x = result
 				}
-				if heroWon(g) {
-					fmt.Println("Hero won!")
-					break keyPressListenerLoop
-				}
+
 			case term.KeyArrowRight:
 				// reset()
 				g.mesa[p.y][p.x] = ' '
 				result := (p.x + 1) % Xs
 				if g.mesa[p.y][result] != '#' {
 					p.x = result
-				}
-				if heroWon(g) {
-					fmt.Println("Hero won!")
-					break keyPressListenerLoop
 				}
 			}
 		case term.EventError:
