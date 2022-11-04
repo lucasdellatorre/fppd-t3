@@ -20,6 +20,8 @@ import (
 	"log"
 	"os"
 	"strings"
+	"math/rand"
+	"time"
 
 	term "github.com/nsf/termbox-go"
 )
@@ -39,7 +41,7 @@ type Player struct {
 	ch rune
 }
 
-func printState(g GameState) {
+func printState(g GameState, villain Player, hero Player){
 	//reset()
 	fmt.Println(g)
 	for i := 0; i < g.ySize; i++ {
@@ -48,10 +50,38 @@ func printState(g GameState) {
 		}
 		fmt.Println("")
 	}
+	if heroWon(g) {
+		for i := 0; i < 1000; i++ {
+			fmt.Println("Hero won!")
+		}
+	}
+	if villainWon(hero, villain) {
+		for i := 0; i < 1000; i++ {
+			fmt.Println("Villain won!")
+		}	
+	}
 }
 
-func main() {
+func heroWon(g GameState) bool {
+	for i := 0; i < g.ySize; i++ {
+		for j := 0; j < g.xSize; j++ {
+			if g.mesa[i][j] == '✪' {
+				return false
+			}
+		}
+	}
+	return true
+}
 
+func villainWon(hero Player, v Player) bool {
+	if v.x == hero.x && v.y == hero.y {
+		return true
+	}
+	return false
+}
+
+func main(){
+	rand.Seed(time.Now().UnixNano())
 	err := term.Init()
 	if err != nil {
 		panic(err)
@@ -97,24 +127,31 @@ func main() {
 				i++
 				fmt.Println(i)
 			} else {
-				mesa1[i][j] = c
-				j++
+				random := rand.Intn(50 - 1) + 1
+				if random == 1 && c!='#' {
+					mesa1[i][j] = '✪'
+					j++
+				} else {
+					mesa1[i][j] = c
+					j++
+				}
 			}
 			fmt.Printf("%q [%d] - i: %d, j: %d\n", string(c), sz, i, j)
 		}
 	}
 
 	g := GameState{xSize: Xs, ySize: Ys, mesa: mesa1}
-	p := Player{x: 1, y: 1, ch: 'k'}
+	p := Player{x: 1, y: 1, ch: 'H'}
+	v := Player{x: 28, y: 27, ch: 'V'}
 	pOld := Player{x: -1, y: -1, ch: ' '}
 
-	printState(g)
+	printState(g, p, v)
 
 keyPressListenerLoop:
 	for {
 		if !(p == pOld) {
 			g.mesa[p.y][p.x] = p.ch
-			printState(g)
+			printState(g, p, v)
 			pOld = p
 		}
 		switch ev := term.PollEvent(); ev.Type {
@@ -124,28 +161,30 @@ keyPressListenerLoop:
 				break keyPressListenerLoop
 			case term.KeyArrowUp:
 				// reset()
-				g.mesa[p.y][p.x] = '.'
+				g.mesa[p.y][p.x] = ' '
 				result := (p.y + Ys - 1) % Ys
 				if g.mesa[result][p.x] != '#' {
 					p.y = result
 				}
 			case term.KeyArrowDown:
 				// reset()
-				g.mesa[p.y][p.x] = '.'
+				g.mesa[p.y][p.x] = ' '
 				result := (p.y + 1) % Ys
 				if g.mesa[result][p.x] != '#' {
 					p.y = result
 				}
+
 			case term.KeyArrowLeft:
 				// reset()
-				g.mesa[p.y][p.x] = '.'
+				g.mesa[p.y][p.x] = ' '
 				result := (p.x + Xs - 1) % Xs
 				if g.mesa[p.y][result] != '#' {
 					p.x = result
 				}
+
 			case term.KeyArrowRight:
 				// reset()
-				g.mesa[p.y][p.x] = '.'
+				g.mesa[p.y][p.x] = ' '
 				result := (p.x + 1) % Xs
 				if g.mesa[p.y][result] != '#' {
 					p.x = result
