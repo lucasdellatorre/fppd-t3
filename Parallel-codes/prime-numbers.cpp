@@ -7,8 +7,8 @@
 #include <getopt.h>
 #include <fstream>
 
-#define MAX 10000000000000
-#define MIN 100000
+#define MAX 10000000000
+#define MIN 1000
 #define NN 1000
 
 using namespace std;
