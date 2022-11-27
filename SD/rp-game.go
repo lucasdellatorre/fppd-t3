@@ -58,9 +58,7 @@ func main() {
 		var msg string
 
 		for {
-			fmt.Println(`Press "r" for rock`)
-			fmt.Println(`Press "p" for paper`)
-			fmt.Println(`Press "s" for scissor`)
+			printCommands()
 
 			if scanner.Scan() {
 				msg = scanner.Text()
@@ -87,19 +85,18 @@ func main() {
 			playerText = message[0]
 
 			if currentRoundValue != "" {
-				// fmt.Println("entrou no if")
-				// fmt.Println("currentValue: ", currentRoundValue)
-				// fmt.Println("playerText: ", playerText)
 				result(currentRoundValue, playerText)
+				fmt.Println("=========================")
+				fmt.Println("P1 score: ", player1Score)
+				fmt.Println("P2 score: ", player2Score)
+				fmt.Println("=========================")
+				printCommands()
 				currentRoundValue = ""
 			} else {
 				currentRoundValue = playerText
 			}
-
-			// imprime a mensagem recebida na tela
 		}
 	}()
-
 	blq := make(chan int)
 	<-blq
 }
@@ -117,4 +114,11 @@ func result(p1 string, p2 string) {
 	case "rr", "pp", "ss":
 		fmt.Println("Match Draws 🤙🏻")
 	}
+}
+
+func printCommands() {
+	fmt.Println(`Press "r" for rock`)
+	fmt.Println(`Press "p" for paper`)
+	fmt.Println(`Press "s" for scissor`)
+	fmt.Println()
 }
